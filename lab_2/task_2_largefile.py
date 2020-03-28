@@ -61,6 +61,9 @@ def generate_file(Mb, K=(10,100), L=(3, 10), filename='largefile.txt'):
     inbytes = int(Mb * 1024**2)   #Size of file in bytes
     f = open(filename, 'w+')
     counter = 0
+    if K[0] > K[1] or L[0] > L[1]:
+        print('Wrong range')
+        return
     while counter < inbytes:
         progress_bar(counter, inbytes)
         wordsnum = random.choice(range(K[0], K[1] + 1))
@@ -96,39 +99,46 @@ def generate_file(Mb, K=(10,100), L=(3, 10), filename='largefile.txt'):
     f.close()
 
 def main():
-    check = input('Press 1 if you want to enter the values\n')
-    if check == '1':
+    args = sys.argv[1:]
+    if not args:
         val = input('Enter the size of your file in MB: ')
         K = input('Enter the words range as (a, b): ')
         L = input('Enter the words\' length range as (a, b): ')
         while val != 'exit':
             while True:
                 try:
-                    float(val)
-                    tuple(map(int, K[1:-1].split(',')))
-                    tuple(map(int, L[1:-1].split(',')))
+                    val = float(val)
+                    K = tuple(map(int, K[1:-1].split(',')))
+                    L = tuple(map(int, L[1:-1].split(',')))
                 except ValueError:
                     print('Wrong input. Try again')  
                     val = input('Enter the size of your file in MB: ')
                     K = input('Enter the words range as (a, b): ')
                     L = input('Enter the words\' length range as (a, b):')
                 else:
-                    val = float(val)
-                    K = tuple(map(int, K[1:-1].split(',')))
-                    L = tuple(map(int, L[1:-1].split(',')))
                     break     
             generate_file(val, K, L)
             val = input('Enter the size of your file in MB or write \'exit\'\
  to close the programm: ')
     else:
-        size = int(sys.argv[1])
-        print('The size of your file: ', size)
-        words = tuple(map(int, [sys.argv[2], sys.argv[3]]))
-        print('The words range: ', words)
-        lett = tuple(map(int, [sys.argv[4], sys.argv[5]]))
-        print('The words\' length range', lett)
-        generate_file(size, words, lett)
-    
+        try:
+            int(args[0])
+            words_l_bound = args[1]
+            words_r_bound = args[2]
+            lett_l_bound = args[3]
+            lett_r_bound = args[4]
+            words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
+            lett = tuple(map(int, [lett_l_bound[1:-1], lett_r_bound[:-1]]))
+        except ValueError:
+            print('Wrong input. Try again')
+        else:
+            size = int(args[0])
+            print('The size of your file: ', size)
+            words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
+            print('The words range: ', words)
+            lett = tuple(map(int, [lett_l_bound[1:-1], lett_r_bound[:-1]]))
+            print('The words\' length range', lett)
+            generate_file(size, words, lett)    
 
 if __name__ == "__main__":
     main()
