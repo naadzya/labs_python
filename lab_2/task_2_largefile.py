@@ -7,6 +7,8 @@ import argparse
 import sys
 import time
 
+__all__ = ['generate_file']
+
 def progress_bar(it, total):
     fillwith = '█'
     dec = 1
@@ -110,7 +112,7 @@ def main():
                     val = float(val)
                     K = tuple(map(int, K[1:-1].split(',')))
                     L = tuple(map(int, L[1:-1].split(',')))
-                except ValueError:
+                except (ValueError, IndexError):
                     print('Wrong input. Try again')  
                     val = input('Enter the size of your file in MB: ')
                     K = input('Enter the words range as (a, b): ')
@@ -122,17 +124,17 @@ def main():
  to close the programm: ')
     else:
         try:
-            int(args[0])
+            float(args[0])
             words_l_bound = args[1]
             words_r_bound = args[2]
             lett_l_bound = args[3]
             lett_r_bound = args[4]
             words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
             lett = tuple(map(int, [lett_l_bound[1:-1], lett_r_bound[:-1]]))
-        except ValueError:
+        except (ValueError, IndexError):
             print('Wrong input. Try again')
         else:
-            size = int(args[0])
+            size = float(args[0])
             print('The size of your file: ', size)
             words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
             print('The words range: ', words)
@@ -142,7 +144,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-  
  
 
 
