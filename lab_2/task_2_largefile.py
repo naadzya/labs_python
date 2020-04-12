@@ -4,10 +4,9 @@
 import random
 import string
 import argparse
-import sys
 import time
 
-__all__ = ['generate_file']
+__all__ = ['generate_file', 'progress_bar']
 
 def progress_bar(it, total):
     fillwith = '█'
@@ -101,8 +100,15 @@ def generate_file(Mb, K=(10,100), L=(3, 10), filename='largefile.txt'):
     f.close()
 
 def main():
-    args = sys.argv[1:]
-    if not args:
+    parser = argparse.ArgumentParser(description='Generation of a file')
+    parser.add_argument('-size', '--MB', type=float, help='Size of the file')
+    parser.add_argument('-K', nargs=2, metavar=('Ks', 'Ke'), type=int,
+                        help='Interval for quantity of words in each line')
+    parser.add_argument('-L', nargs=2, metavar=('Ls', 'Le'), type=int,
+                        help='Interval for quantity of words in each line')
+    parser.add_argument('-name', type=str, help='Name of file')
+    args = parser.parse_args()
+    if not any([args.MB, args.K, args.L]):
         val = input('Enter the size of your file in MB: ')
         K = input('Enter the words range as (a, b): ')
         L = input('Enter the words\' length range as (a, b): ')
@@ -116,31 +122,19 @@ def main():
                     print('Wrong input. Try again')  
                     val = input('Enter the size of your file in MB: ')
                     K = input('Enter the words range as (a, b): ')
-                    L = input('Enter the words\' length range as (a, b):')
+                    L = input('Enter the words\' length range as (a, b): ')
                 else:
                     break     
             generate_file(val, K, L)
             val = input('Enter the size of your file in MB or write \'exit\'\
  to close the programm: ')
     else:
-        try:
-            float(args[0])
-            words_l_bound = args[1]
-            words_r_bound = args[2]
-            lett_l_bound = args[3]
-            lett_r_bound = args[4]
-            words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
-            lett = tuple(map(int, [lett_l_bound[1:-1], lett_r_bound[:-1]]))
-        except (ValueError, IndexError):
-            print('Wrong input. Try again')
-        else:
-            size = float(args[0])
-            print('The size of your file: ', size)
-            words = tuple(map(int, [words_l_bound[1:-1], words_r_bound[:-1]]))
-            print('The words range: ', words)
-            lett = tuple(map(int, [lett_l_bound[1:-1], lett_r_bound[:-1]]))
-            print('The words\' length range', lett)
-            generate_file(size, words, lett)    
+        print('The size of your file: ', args.MB)
+        print('The words interval: ', args.K)
+        print('The words\' length interval', args.L)
+        if not args.name:
+            args.name = "largefile.txt"
+        generate_file(args.MB, args.K, args.L, args.name)    
 
 if __name__ == "__main__":
     main()
