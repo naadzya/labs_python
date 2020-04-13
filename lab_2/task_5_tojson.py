@@ -2,8 +2,14 @@
 #-*- coding:utf-8 -*-
 
 from math import modf
+import argparse
 
 __all__ = ['to_json']
+
+def read_from_file(filename: str):
+    with open(filename) as f:
+        line = f.readline()
+        return eval(line)
 
 def int_to_json(obj: int):
     """Serialize int object to a JSON formatted str
@@ -41,29 +47,12 @@ def onedim_to_json(obj):
         for subobj in obj:
             jstr += to_json(subobj) + ", "
         return jstr[:-2] + "]"
-    jstr = "{"
-    for key, value in obj.items():
-        flag = (isinstance(key, (str, int, float, bool))
-                    or key is None)
-        if not flag:           #If key can be serialized for json object
-            raise ValueError
-        if isinstance(key, str):
-            jstr += to_json(key) + ": " + to_json(value) + ", "
-        else:
-            jstr += (str_to_json(to_json(key)) + ": "
-                     + to_json(value) + ", ")
-    return jstr[:-2] + "}"
 
 def is_there_iter(A):
     """Returns True if there is at least one nested list,
     tuple or dict in A
     """
-    if isinstance(A, dict):
-        return any(isinstance(A[k], dict) for k in A.keys())
-    return any(isinstance(i, (list, tuple, dict)) for i in A)
-
-def is_there_dict(A):
-    return any(isinstance(A[k], dict) for k in A.keys())
+    return any(isinstance(i, (list, tuple)) for i in A)
 
 def array_json(obj):
     """Serialize list or tuple to a JSON formatted str
@@ -71,12 +60,12 @@ def array_json(obj):
     jstr = "["
     if is_there_iter(obj):
         for subobj in obj:
-            if not isinstance(subobj, (list, tuple, dict)):
+            if isinstance(subobj, dict):
+                jstr += dict_to_json(subobj)
+            elif not isinstance(subobj, (list, tuple, dict)):
                 jstr += to_json(subobj)
             elif not (is_there_iter(subobj)):
                 jstr += onedim_to_json(subobj)
-            elif isinstance(subobj, dict):
-                jstr += dict_to_json(subobj)
             else:
                 jstr += array_json(subobj)
             jstr += ", "
@@ -88,23 +77,21 @@ def dict_to_json(obj):
     """Serialize a dict to a JSON formatted str
     """
     jstr = '{'
-    if is_there_dict(obj):
-        for key, value in obj.items():
-            flag = (isinstance(key, (str, int, float, bool))
-                        or key is None)
-            if not flag:
-                raise ValueError
-            if isinstance(key, str):
-                jstr += to_json(key) + ': '
-            else:
-                jstr += str_to_json(to_json(key)) + ': '
-            if not isinstance(value, dict):
-                jstr += to_json(value)
-            else:
-                jstr += dict_to_json(value)
-            jstr += ", "
-        return jstr[:-2] + "}"
-    return onedim_to_json(obj)
+    for key, value in obj.items():
+        flag = (isinstance(key, (str, int, float, bool))
+                    or key is None)
+        if not flag:
+            raise ValueError
+        if isinstance(key, str):
+            jstr += to_json(key) + ': '
+        else:
+            jstr += str_to_json(to_json(key)) + ': '
+        if not isinstance(value, dict):
+            jstr += to_json(value)
+        else:
+            jstr += dict_to_json(value)
+        jstr += ", "
+    return jstr[:-2] + "}"
         
 
 def to_json(obj):
@@ -129,8 +116,18 @@ def to_json(obj):
     raise ValueError
 
 def main():
-    print(to_json({1: "one", "2": "two", 3: [True, "str", (None, [])],
-                   4: {"sub": 5, "newsub": (1,)}}))
+    parser = argparse.ArgumentParser(description='From bject to a JSON formatted str')
+    parser.add_argument('-obj', type=str, help='Python object')
+    args = parser.parse_args()
+    if not args.obj:
+        val = input('Press 1 if you want to enter your object\n'\
+            'If you want to read your object from a file, enter the name '\
+            'of the file\n')
+        val = (eval(input('Enter your object\n')) if val == '1'
+               else read_from_file(val))
+    else:
+        val = eval(args.obj)
+    print(f"A JSON formatted str:\n{to_json(val)}")
 
 if __name__ == '__main__':
     main()
