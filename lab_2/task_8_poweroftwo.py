@@ -2,7 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import time
-import sys
+import argparse
 
 __all__ = ['is_power_of_two']
 
@@ -11,8 +11,11 @@ def is_power_of_two(n: int):
     return inbin == '0'*len(inbin)
 
 def main():
-    args = sys.argv[1:]
-    if not args:
+    parser = argparse.ArgumentParser(description='Power of two')
+    parser.add_argument('-n', type=int,
+                        help='A number that supposed to be checked')
+    args = parser.parse_args()
+    if not args.n:
         val = input('Enter your number: ')
         while val != 'exit':
             while not val.isdigit():
@@ -20,15 +23,10 @@ def main():
                 val = input()
             print('It\'s power of 2' if is_power_of_two(int(val))
                   else 'It\'s not power of two')
-            val = input('Enter your number or write exit to \
-close the programm: ')
+            val = input('Enter your number or write "exit" to close the programm: ')
         return
-    val = args[0]
-    if not val.isdigit():
-        print('Wrong input')
-        return
-    print('It\'s power of 2' if is_power_of_two(int(val))
-                  else 'It\'s not power of two')
+    print('It\'s power of 2' if is_power_of_two(args.n)
+          else 'It\'s not power of two')
 
 if __name__ == '__main__':
     main()
