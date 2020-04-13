@@ -3,7 +3,7 @@ def input_list():
     """ Reads entered numbers from console
         in list
     """
-    userstr = input('Enter a list numbers or elements '\
+    userstr = input('Enter a list of numbers or elements '\
                     'separated by space:\n')
     userlist = userstr.split()
     for i in range(len(userlist)):
