@@ -1,6 +1,6 @@
 #Task 7
 import time
-import sys
+import argparse
 
 __all__ = ['leonardonum']
 
@@ -33,25 +33,22 @@ def leonardonum(n: int):
     return Ln
 
 def main():
-    args = sys.argv[1:]
-    if not args:
+    parser = argparse.ArgumentParser(description='Leonardo sequence')
+    parser.add_argument('-n', type=int,
+                        help='to find n-th number in Leonardo sequence')
+    args = parser.parse_args()
+    if not args.n:
         val = input('Enter your number: ')
         while val != 'exit':
             while not val.isdigit():
                 print('Wrong input. Try again')
                 val = input()
             val = int(val)
-            print(f'The {val}th number in Leonardo sequence:\n\
-{leonardonum(val)}')
-            val = input('Enter your number or write exit \
-to close the programm: ')
+            print(f'The {val}th number in Leonardo sequence:\n{leonardonum(val)}')
+            val = input('Enter your number or write exit to close the programm: ')
         return
-    val = args[0]
-    if not val.isdigit():
-        print('Wrong input')
-        return
-    print(f'The {val}th number in Leonardo sequence:\n\
-{leonardonum(int(val))}')
+    val = args.n
+    print(f'The {val}th number in Leonardo sequence:\n{leonardonum(int(val))}')
 
 if __name__ == '__main__':
     main()
